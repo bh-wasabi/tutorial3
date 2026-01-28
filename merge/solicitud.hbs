@@ -42,6 +42,7 @@
     {{calc field="nombre" type="expr" value="=join._name"}}
     {{calc field="estatus" type="expr" value="=calc.getRef(@_updated,'moment')||base.estatus"}}
     {{calc field="_estatus" type="expr" value="=calc.getRef(@_updated,'_moment')||base._estatus"}}
+    {{calc field="semaforo" type="expr" value="=moment().diff(moment(_created.date), 'minutes')>2?'red':'green'"}}
   {{/view}}
 
   {{#view id="inactivos"}}
@@ -60,7 +61,6 @@
       {{include field="_moment2"}}
       {{sort condition="=conPrioridad" field="base.prioridad" direction="asc"}}
       {{sort condition="=ordenNombreCorto" field="base.nombreCorto" direction="asc"}}
-      {{!-- {{sort field="base.fechaHoraCita" direction="asc"}} --}}
       {{sort field="_id" direction="desc"}}
       {{search field="_name"}}
       {{search field="_parent.name"}}
@@ -80,6 +80,8 @@
     {{calc field="nombre" type="expr" value="=join._name"}}
     {{calc field="estatus" type="expr" value="=calc.getRef(@_updated,'moment')||base.estatus"}}
     {{calc field="_estatus" type="expr" value="=calc.getRef(@_updated,'_moment')||base._estatus"}}
+    {{calc field="icono" type="expr" value="=_updated.moment=='rechazado'?'close':'checkmark'"}}
+    {{calc field="color" type="expr" value="=_updated.moment=='rechazado'?'red':'grey'"}}
   {{/view}}
 
   {{#view id="todo"}}
@@ -150,12 +152,17 @@
   {{#template id="verSolicitud"}}
     <div class="list-material">
       <li class="has-action-left">
-        <div class="list-action-left">
-        </div>
+        {{#if semaforo}}
+        <div class="list-action-left"><i class="icon ion-record text-{{semaforo}}"></i></div>
+        {{else}}
+        <div class="list-action-left"><i class="icon ion-{{icono}} text-{{color}}"></i></div>
+        {{/if}}
         <div class="list-content">
           <span class="title">{{nombre}}
             <span style="float:right;"><strong>{{_created.folio}}</strong></span>          
           </span>          
+          <span style="font-size:12px;">{{date _created.date "DD/MMM/YYYY h:mma"}}</span>
+          <br>
           <span style="font-size:12px;white-space:pre-wrap;font-style:italic;">{{_name}}</span>
           {{#if control.subMoment}}
           <span style="float:right;" class="subMoment">&nbsp;&nbsp;{{control._subMoment}}</span>
