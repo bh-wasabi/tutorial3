@@ -10,10 +10,12 @@
         <bpmn:flowNodeRef>Activity_0efcrf6</bpmn:flowNodeRef>
       </bpmn:lane>
       <bpmn:lane id="Lane_1exdgmq" name="Servicio">
-        <bpmn:flowNodeRef>Event_08ryzik</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>enProceso</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>programado</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_1nlk48w</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_08ryzik</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>finalizado</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>rechazado</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>enProceso</bpmn:flowNodeRef>
       </bpmn:lane>
     </bpmn:laneSet>
     <bpmn:startEvent id="Event_0nmybhs">
@@ -24,38 +26,51 @@
       <bpmn:outgoing>Flow_0wjc15z</bpmn:outgoing>
     </bpmn:task>
     <bpmn:sequenceFlow id="Flow_1tq9b46" sourceRef="finalizado" targetRef="Event_08ryzik" />
-    <bpmn:sequenceFlow id="Flow_0wjc15z" sourceRef="Activity_0efcrf6" targetRef="programado" />
     <bpmn:sequenceFlow id="Flow_1ej2iac" sourceRef="Event_0nmybhs" targetRef="Activity_0efcrf6" />
     <bpmn:sequenceFlow id="Flow_11axgsz" sourceRef="enProceso" targetRef="finalizado" />
-    <bpmn:endEvent id="Event_08ryzik">
-      <bpmn:incoming>Flow_1tq9b46</bpmn:incoming>
-    </bpmn:endEvent>
-    <bpmn:subProcess id="enProceso" name="En Proceso">
-      <bpmn:incoming>Flow_07qq38v</bpmn:incoming>
-      <bpmn:outgoing>Flow_11axgsz</bpmn:outgoing>
-    </bpmn:subProcess>
     <bpmn:task id="programado" name="Coordinando Requerimiento">
       <bpmn:incoming>Flow_0wjc15z</bpmn:incoming>
-      <bpmn:outgoing>Flow_07qq38v</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0ej3utf</bpmn:outgoing>
     </bpmn:task>
-    <bpmn:sequenceFlow id="Flow_07qq38v" sourceRef="programado" targetRef="enProceso" />
+    <bpmn:sequenceFlow id="Flow_0wjc15z" sourceRef="Activity_0efcrf6" targetRef="programado" />
+    <bpmn:sequenceFlow id="Flow_0ej3utf" sourceRef="programado" targetRef="Gateway_1nlk48w" />
+    <bpmn:sequenceFlow id="Flow_0oil1yp" name="Aceptación" sourceRef="Gateway_1nlk48w" targetRef="enProceso" />
+    <bpmn:exclusiveGateway id="Gateway_1nlk48w">
+      <bpmn:incoming>Flow_0ej3utf</bpmn:incoming>
+      <bpmn:outgoing>Flow_0oil1yp</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1j5cjel</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:subProcess id="enProceso" name="En Proceso">
+      <bpmn:incoming>Flow_0oil1yp</bpmn:incoming>
+      <bpmn:outgoing>Flow_11axgsz</bpmn:outgoing>
+    </bpmn:subProcess>
+    <bpmn:endEvent id="Event_08ryzik">
+      <bpmn:incoming>Flow_1tq9b46</bpmn:incoming>
+      <bpmn:incoming>Flow_1u2ql37</bpmn:incoming>
+    </bpmn:endEvent>
     <bpmn:task id="finalizado" name="Requerimiento Finalizado">
       <bpmn:incoming>Flow_11axgsz</bpmn:incoming>
       <bpmn:outgoing>Flow_1tq9b46</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:sequenceFlow id="Flow_1j5cjel" sourceRef="Gateway_1nlk48w" targetRef="rechazado" />
+    <bpmn:sequenceFlow id="Flow_1u2ql37" sourceRef="rechazado" targetRef="Event_08ryzik" />
+    <bpmn:task id="rechazado" name="Rechazado">
+      <bpmn:incoming>Flow_1j5cjel</bpmn:incoming>
+      <bpmn:outgoing>Flow_1u2ql37</bpmn:outgoing>
     </bpmn:task>
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="solicitud">
       <bpmndi:BPMNShape id="Participant_12j5v6j_di" bpmnElement="Participant_12j5v6j" isHorizontal="true">
-        <dc:Bounds x="129" y="79" width="721" height="301" />
+        <dc:Bounds x="129" y="79" width="849" height="411" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Lane_1exdgmq_di" bpmnElement="Lane_1exdgmq" isHorizontal="true">
-        <dc:Bounds x="159" y="229" width="691" height="151" />
+        <dc:Bounds x="159" y="229" width="819" height="261" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Lane_1sa95g1_di" bpmnElement="Lane_1sa95g1" isHorizontal="true">
-        <dc:Bounds x="159" y="79" width="691" height="150" />
+        <dc:Bounds x="159" y="79" width="819" height="150" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_0nmybhs_di" bpmnElement="Event_0nmybhs">
@@ -65,23 +80,30 @@
         <dc:Bounds x="289" y="104" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_08ryzik_di" bpmnElement="Event_08ryzik">
-        <dc:Bounds x="772" y="291" width="36" height="36" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1cvk203_di" bpmnElement="enProceso">
-        <dc:Bounds x="460" y="269" width="100" height="80" />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_17ty7d5_di" bpmnElement="programado">
         <dc:Bounds x="289" y="269" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1nlk48w_di" bpmnElement="Gateway_1nlk48w" isMarkerVisible="true">
+        <dc:Bounds x="465" y="284" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_08ryzik_di" bpmnElement="Event_08ryzik">
+        <dc:Bounds x="922" y="291" width="36" height="36" />
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1ejnfb9_di" bpmnElement="finalizado">
-        <dc:Bounds x="630" y="269" width="100" height="80" />
+        <dc:Bounds x="780" y="269" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0a1zf5n_di" bpmnElement="rechazado">
+        <dc:Bounds x="440" y="380" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1cvk203_di" bpmnElement="enProceso">
+        <dc:Bounds x="620" y="269" width="100" height="80" />
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_1tq9b46_di" bpmnElement="Flow_1tq9b46">
-        <di:waypoint x="730" y="309" />
-        <di:waypoint x="772" y="309" />
+        <di:waypoint x="880" y="309" />
+        <di:waypoint x="922" y="309" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0wjc15z_di" bpmnElement="Flow_0wjc15z">
         <di:waypoint x="339" y="184" />
@@ -92,12 +114,28 @@
         <di:waypoint x="289" y="144" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_11axgsz_di" bpmnElement="Flow_11axgsz">
-        <di:waypoint x="560" y="309" />
-        <di:waypoint x="630" y="309" />
+        <di:waypoint x="720" y="309" />
+        <di:waypoint x="780" y="309" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_07qq38v_di" bpmnElement="Flow_07qq38v">
+      <bpmndi:BPMNEdge id="Flow_0ej3utf_di" bpmnElement="Flow_0ej3utf">
         <di:waypoint x="389" y="309" />
-        <di:waypoint x="460" y="309" />
+        <di:waypoint x="465" y="309" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0oil1yp_di" bpmnElement="Flow_0oil1yp">
+        <di:waypoint x="515" y="309" />
+        <di:waypoint x="620" y="309" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="526" y="291" width="55" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1j5cjel_di" bpmnElement="Flow_1j5cjel">
+        <di:waypoint x="490" y="334" />
+        <di:waypoint x="490" y="380" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1u2ql37_di" bpmnElement="Flow_1u2ql37">
+        <di:waypoint x="540" y="420" />
+        <di:waypoint x="940" y="420" />
+        <di:waypoint x="940" y="327" />
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
